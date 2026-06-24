@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Panel podsumowania globalnego budżetu -->
 <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-8">
     <h2 class="text-lg font-bold text-slate-900 mb-4">📊 Twój Panel Oszczędnościowy</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
         <div class="bg-indigo-50 p-4 rounded-lg">
             <p class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Suma zgromadzonych środków</p>
             <p class="text-2xl font-extrabold text-indigo-900 mt-1">{{ total_saved }} zł</p>
@@ -12,88 +13,95 @@
             <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Wszystkie cele łącznie</p>
             <p class="text-2xl font-extrabold text-slate-800 mt-1">{{ total_target }} zł</p>
         </div>
+        <div class="bg-emerald-50 p-4 rounded-lg">
+            <p class="text-xs text-emerald-600 font-semibold uppercase tracking-wider">Ogólny postęp planu</p>
+            <p class="text-2xl font-extrabold text-emerald-900 mt-1">{{ global_progress }}%</p>
+        </div>
     </div>
     
-    <div class="mt-4">
-        <div class="flex justify-between items-center text-xs text-slate-500 font-bold mb-1">
-            <span>GLOBALNY POSTĘP REALIZACJI</span>
-            <span class="text-indigo-600">{{ global_progress }}%</span>
-        </div>
-        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-            <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: {{ global_progress }}%"></div>
-        </div>
+    <!-- Pasek postępu zbiorczego -->
+    <div class="w-full bg-slate-200 rounded-full h-2.5">
+        <div class="bg-emerald-500 h-2.5 rounded-full" style="width: {{ global_progress }}%"></div>
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-8">
-    <h3 class="text-md font-bold text-slate-900 mb-4">🆕 Zdefiniuj nowy cel oszczędnościowy</h3>
-    <form action="{{ url_for('add_goal') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nazwa zamierzenia</label>
-            <input type="text" name="title" required placeholder="np. Dom Letniskowy, Fundusz awaryjny" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all">
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kwota docelowa</label>
-            <div class="relative">
-                <input type="number" name="target_amount" step="0.01" min="0.01" required placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all">
-                <span class="absolute right-3 top-2.5 text-xs font-bold text-slate-400">PLN</span>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Formularz dodawania nowego celu (CREATE) -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 h-fit">
+        <h3 class="text-base font-bold text-slate-900 mb-4">🎯 Dodaj nowy cel oszczędnościowy</h3>
+        <form action="{{ url_for('add_goal') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nazwa celu finansowego</label>
+                <input type="text" name="title" placeholder="np. Nowy laptop, Wakacje" required
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kategoria i ikona</label>
-            <select name="category" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:bg-white transition-all">
-                <option value="Elektronika">💻 Elektronika</option>
-                <option value="Podróże">✈️ Podróże</option>
-                <option value="Edukacja">📚 Edukacja</option>
-                <option value="Pojazd">🚗 Pojazd</option>
-                <option value="Poduszka finansowa">🛡️ Poduszka finansowa</option>
-                <option value="Ogólne" selected>📦 Ogólne</option>
-            </select>
-        </div>
-        <div class="md:col-span-3 text-right mt-2">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-bold text-sm px-5 py-2.5 rounded-lg shadow-sm">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kwota docelowa (zł)</label>
+                <input type="number" step="0.01" name="target_amount" placeholder="np. 3500" required
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kategoria</label>
+                <select name="category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="Elektronika">💻 Elektronika</option>
+                    <option value="Podróże">✈️ Podróże</option>
+                    <option value="Edukacja">📚 Edukacja</option>
+                    <option value="Pojazd">🚗 Pojazd</option>
+                    <option value="Poduszka finansowa">🛡️ Poduszka finansowa</option>
+                    <option value="Ogólne" selected>📦 Ogólne</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition duration-150 shadow-sm">
                 Dodaj cel do systemu
             </button>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<div>
-    <h3 class="text-lg font-black text-slate-900 mb-4">📋 Twoje Aktywne Skarbonki</h3>
-    {% if goals %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Lista istniejących celów (READ / DELETE) -->
+    <div class="lg:col-span-2 space-y-4">
+        <h3 class="text-base font-bold text-slate-900 mb-2">📋 Twoje aktywne cele oszczędnościowe</h3>
+        
+        {% if not goals %}
+            <div class="bg-white rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500 text-sm">
+                Brak zdefiniowanych celów. Skorzystaj z formularza po lewej stronie, aby dodać swój pierwszy cel!
+            </div>
+        {% else %}
             {% for goal in goals %}
-                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200 hover:border-slate-300 transition flex flex-col justify-between">
                     <div>
-                        <div class="flex justify-between items-start mb-3">
-                            <h4 class="font-extrabold text-slate-900 text-base">{{ goal.title }}</h4>
-                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">{{ goal.category }}</span>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="inline-block px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600 rounded mb-1">{{ goal.category }}</span>
+                                <h4 class="text-lg font-bold text-slate-900">{{ goal.title }}</h4>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-indigo-600">{{ goal.current_amount }} zł</p>
+                                <p class="text-xs text-slate-500">z wymaganych {{ goal.target_amount }} zł</p>
+                            </div>
                         </div>
-                        <div class="text-sm text-slate-500 mb-4">
-                            Zgromadzono: <strong class="text-slate-800">{{ goal.current_amount }} zł</strong> z {{ goal.target_amount }} zł
+
+                        <!-- Pasek postępu dla konkretnego celu -->
+                        <div class="w-full bg-slate-100 rounded-full h-2 mb-3 mt-4">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: {{ goal.get_progress() }}%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 font-medium mb-4">
+                            <span>Postęp: {{ goal.get_progress() }}%</span>
+                            <span>Do zebrania: {{ (goal.target_amount - goal.current_amount)|round(2) if goal.target_amount > goal.current_amount else 0 }} zł</span>
                         </div>
                     </div>
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-1">
-                                <span>STAN POSTĘPU</span>
-                                <span class="text-emerald-600">{{ goal.get_progress() }}%</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                                <div class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: {{ goal.get_progress() }}%"></div>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('goal_detail', goal_id=goal.id) }}" class="block text-center bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-colors">
+
+                    <!-- Akcje CRUD dla celu -->
+                    <div class="flex justify-end space-x-3 border-t border-slate-100 pt-3 text-xs">
+                        <a href="{{ url_for('goal_detail', goal_id=goal.id) }}" class="text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 px-3 py-1.5 rounded-lg transition">
                             🔎 Zarządzaj i Wpłać
+                        </a>
+                        <a href="{{ url_for('delete_goal', goal_id=goal.id) }}" onclick="return confirm('Czy na pewno chcesz usunąć ten cel i wszystkie jego wpłaty?')" class="text-red-600 hover:text-red-800 font-semibold bg-red-50 px-3 py-1.5 rounded-lg transition">
+                            🗑️ Usuń Cel
                         </a>
                     </div>
                 </div>
             {% endfor %}
-        </div>
-    {% else %}
-        <div class="bg-white p-8 text-center border border-dashed border-slate-200 rounded-xl text-slate-400 text-sm">
-            Brak zdefiniowanych celów w bazie danych. Użyj powyższego formularza, aby dodać pierwszy cel.
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
